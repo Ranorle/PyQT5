@@ -1,0 +1,52 @@
+/* style.qss */
+/* 设置QLabel背景颜色、边框和内边距 */
+#centerWidget{
+    border-radius: 8px; /* 圆角半径为 10 像素 */
+    background-image: url("./assets/background.png");
+    background-origin: content;
+    background-clip: content;
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 200px; /* 设置窗口宽度 */
+    height: 100px; /* 设置窗口高度 */
+}
+QLabel#cursorLabel{
+    font-size: 40px;
+    color: #333;
+}
+QLabel#welcomeLabel {
+    width:100%;
+    font-size: 40px;
+    color: #333;
+    margin: 0px;
+    padding: 0px;  /* 设置内边距 */
+    }
+/* 设置QListWidget的背景色和边框 */
+QListWidget {
+    font-size: 15px;
+    background-color: #f0f0f0;
+    border: 0px;
+    margin:0px;
+    padding:0px;
+    height: 100%;
+}
+
+/* 设置QListWidget中项的背景色和边框 */
+QListWidget::item {
+    margin-top:10px;
+    color:#222;
+    background-color: #eee;
+    border-bottom: 0px ;
+    height:40px;
+}
+
+/* 设置QListWidget中选中项的背景色 */
+QListWidget::item:hover {
+    background-color: #ffeaeaea;
+}
+
+/* 设置QListWidget中选中项的背景色 */
+QListWidget::item:selected {
+    color:#e55;
+    background-color: #ddd;
+}
