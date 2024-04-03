@@ -1,34 +1,68 @@
-from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLabel
-from PyQt5.QtCore import Qt, QTimer
+import sys
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 
 class WelcomeWidget(QWidget):
+    sensor_system_clicked = pyqtSignal(int)
     def __init__(self):
         super().__init__()
         self.initUI()
-
+    
     def initUI(self):
-        welcome_layout = QHBoxLayout(self)
+        main_layout = QVBoxLayout(self)
+        main_layout.setContentsMargins(0, 0, 0, 0)  # 设置vlayout布局边距为0
+
+        # 垂直布局用于容纳打字机部分和按钮
+        vertical_layout = QVBoxLayout()
+        
         center_widget = QWidget()
         center_layout = QHBoxLayout(center_widget)
-        center_layout.setAlignment(Qt.AlignCenter)
+        center_layout.setAlignment(Qt.AlignCenter | Qt.AlignBottom)
+        
         center_widget.setObjectName("centerWidget")
         self.welcome_label = QLabel('', center_widget)
         self.welcome_label.setObjectName('welcomeLabel')
+        font = QFont("华康少女文字W5(P)")
+        self.welcome_label.setFont(font)
         center_layout.addWidget(self.welcome_label)
 
         # 添加光标label
         self.cursor_label = QLabel('|', center_widget)
         self.cursor_label.setObjectName('cursorLabel')
         center_layout.addWidget(self.cursor_label)
+        
+        # 将按钮布局添加到中心布局
+        button_layout = QHBoxLayout()  # 按钮布局
+        button1 = QPushButton('进入传感器系统')
+        button2 = QPushButton('进入小车控制系统')
+        button3 = QPushButton('进入历史数据查询')
+        button4 = QPushButton('进入设置')
+        button1.setObjectName('entrybutton')
+        button2.setObjectName('entrybutton')
+        button3.setObjectName('entrybutton')
+        button4.setObjectName('entrybutton')
+        button_layout.addWidget(button1)
+        button_layout.addWidget(button2)
+        button_layout.addWidget(button3)
+        button_layout.addWidget(button4)
 
-        welcome_layout.addWidget(center_widget)
-        self.setLayout(welcome_layout)
+        vertical_layout.addWidget(center_widget)
+        vertical_layout.addLayout(button_layout)
 
+        main_layout.addLayout(vertical_layout)
+        self.setLayout(main_layout)
+
+        button1.clicked.connect(self.enterSensorSystem)
+        button2.clicked.connect(self.enterCarControlSystem)
+        button3.clicked.connect(self.enterDataQuery)
+        button4.clicked.connect(self.enterSettings)
+        
         # 设置打字机效果的定时器
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateLabel)
         self.index = 0
-        self.texts = ["你好！", "欢迎来到无敌爆龙战神之上位机系统!", "中国农业大学信电学院电子212究级之第n小组", "荣誉巨献。"]
+        self.texts = ["你好！", "欢迎来到无敌爆龙战神之上位机系统!", "中国农业大学信电学院电子212究级之第13小组", "荣誉巨献。"]
         self.current_text_index = 0
         self.is_deleting = False
         self.is_showing_cursor = False  # 控制光标显示
@@ -91,3 +125,15 @@ class WelcomeWidget(QWidget):
         else:
             self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: black; }")  # 设置光标颜色为黑色
             self.is_cursor_black = True
+
+    def enterSensorSystem(self):
+        self.sensor_system_clicked.emit(1)  # Emit the signal when the button is clicked
+
+    def enterCarControlSystem(self):
+        self.sensor_system_clicked.emit(2)  # Emit the signal when the button is clicked
+
+    def enterDataQuery(self):
+        self.sensor_system_clicked.emit(3)  # Emit the signal when the button is clicked
+
+    def enterSettings(self):
+        self.sensor_system_clicked.emit(4)  # Emit the signal when the button is clicked
