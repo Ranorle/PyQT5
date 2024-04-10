@@ -1,5 +1,6 @@
 /* style.qss */
 /* 设置QLabel背景颜色、边框和内边距 */
+/* 主界面 style*/
 #centerWidget{
     background-color:white;
     background-image: url("./assets/background.png");
@@ -14,16 +15,21 @@
     padding:20px;
 }
 #topArea{
+    color:black;
+
     background-color:#f6f6f6;
 }
 #topLeftWidget{
+    color:black;
     background-color:#f6f6f6;
     margin:0px;
 }
 #topRightWidget{
+    color:black;
     background-color:#f9f9f9;
 }
 #lianjieLabel{
+    color:black;
     margin-left:10px;
 }
 QLabel#cursorLabel{
@@ -49,6 +55,7 @@ QListWidget {
     height: 100%;
 }
 #entrybutton{
+    min-width:140px;
     margin-left:20px;
     margin-right:20px;
     font-size:16px;
@@ -92,4 +99,13 @@ QListWidget::item:hover {
 QListWidget::item:selected {
     color:#1f9cd6;
     background-color: #ddd;
+}
+
+/* 设置style */
+#Groupboxs{
+    color:black;
+    font-size:15px;
+}
+#settingLayout{
+    color:black;
 }

@@ -7,13 +7,13 @@ from widgets.chuanganqi_widget import ChuanganqiWidget
 from widgets.xiaoche_widget import XiaocheWidget
 from widgets.lishishuju_widget import HistoryWidget
 from widgets.shezhi_widget import SettingWidget
+from widgets.sorry_widget import SorryWidget
 
 class wholeScreen(QMainWindow):
-    database_connection=0
-    car_connection=0
-
     def __init__(self):
         super().__init__()
+        self.database_connection = 0
+        self.car_connection = 0
         self.initUI()
 
     def initUI(self):
@@ -55,16 +55,16 @@ class wholeScreen(QMainWindow):
         right_layout.setSpacing(0)  
         left_layout.setSpacing(0)  
         # 标题
-        database_connection_icon_path ="./icon_connect/data1.svg"
+        self.database_connection_icon_path ="./icon_connect/data1.svg"
         if(self.database_connection==1) :
-            database_connection_icon_path="./icon_connect/data1.svg"
+            self.database_connection_icon_path="./icon_connect/data1.svg"
         else:
-            database_connection_icon_path="./icon_disconnect/data1.svg"
-        wifi_connection_icon_path ="./icon_connect/wifi.svg"
+            self.database_connection_icon_path="./icon_disconnect/data1.svg"
+        self.wifi_connection_icon_path ="./icon_connect/wifi.svg"
         if(self.database_connection==1) :
-            wifi_connection_icon_path="./icon_connect/wifi.svg"
+            self.wifi_connection_icon_path="./icon_connect/wifi.svg"
         else:
-            wifi_connection_icon_path="./icon_disconnect/wifi.svg"
+            self.wifi_connection_icon_path="./icon_disconnect/wifi.svg"
         lianjie_label = QLabel('数据库连接状态:')
         lianjie_label.setAlignment(Qt.AlignCenter)
         lianjie_label.setObjectName("lianjieLabel")
@@ -75,19 +75,19 @@ class wholeScreen(QMainWindow):
         right_layout.addStretch(1)
         right_layout.addWidget(lianjie_label)
         
-        database_connection_icon = QLabel()
-        pixmap = QPixmap(database_connection_icon_path)
+        self.database_connection_icon = QLabel()
+        pixmap = QPixmap(self.database_connection_icon_path)
         scaled_pixmap = pixmap.scaled(QSize(20, 20))  # 调整图标大小为 20x20
-        database_connection_icon.setPixmap(scaled_pixmap)
-        right_layout.addWidget(database_connection_icon)
+        self.database_connection_icon.setPixmap(scaled_pixmap)
+        right_layout.addWidget(self.database_connection_icon)
         
         right_layout.addWidget(lianjie_label1)
         
-        wifi_connection_icon = QLabel()
-        pixmap = QPixmap(wifi_connection_icon_path)
+        self.wifi_connection_icon = QLabel()
+        pixmap = QPixmap(self.wifi_connection_icon_path)
         scaled_pixmap = pixmap.scaled(QSize(24, 24))  # 调整图标大小为 20x20
-        wifi_connection_icon.setPixmap(scaled_pixmap)
-        right_layout.addWidget(wifi_connection_icon)
+        self.wifi_connection_icon.setPixmap(scaled_pixmap)
+        right_layout.addWidget(self.wifi_connection_icon)
         
         top_layout.addWidget(right_widget)
 
@@ -133,10 +133,11 @@ class wholeScreen(QMainWindow):
 
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.addWidget(WelcomeWidget())  # 添加首页
-        self.stacked_widget.addWidget(ChuanganqiWidget())  # 添加传感器系统页面
-        self.stacked_widget.addWidget(XiaocheWidget())  # 添加小车控制系统页面
-        self.stacked_widget.addWidget(HistoryWidget())  # 添加小车控制系统页面
-        self.stacked_widget.addWidget(SettingWidget())  # 添加小车控制系统页面
+        self.stacked_widget.addWidget(SorryWidget())  # 添加传感器系统页面
+        self.stacked_widget.addWidget(SorryWidget())  # 添加小车控制系统页面
+        self.stacked_widget.addWidget(HistoryWidget())  
+        setting_widget = SettingWidget()  # 添加设置页面
+        self.stacked_widget.addWidget(setting_widget)
 
         layout.addWidget(self.stacked_widget)
 
@@ -165,16 +166,61 @@ class wholeScreen(QMainWindow):
         palette = self.palette()
         palette.setColor(self.backgroundRole(), QColor("white"))
         self.setPalette(palette)
-
+        
+        setting_widget.database_connection_changed.connect(self.update_database_connection)
+        setting_widget.car_connection_changed.connect(self.update_car_connection)
     def onItemSelected(self, item):
         index = self.list_widget.row(item)
         self.stacked_widget.setCurrentIndex(index)
 
-    def selectSensorSystemItem(self,value):
+    def selectSensorSystemItem(self, value):
         self.list_widget.setCurrentRow(value)  # 选择传感器系统项
         self.stacked_widget.setCurrentIndex(value)  # 切换到传感器系统页面
 
+    def update_connections(self, database_connection, car_connection):
+        self.database_connection = database_connection
+        self.car_connection = car_connection
 
+    def update_database_connection(self, value):
+        self.database_connection = value
+        if self.database_connection ==0 :
+            self.database_connection_icon_path = "./icon_disconnect/data1.svg"
+        else:
+            self.database_connection_icon_path = "./icon_connect/data1.svg"       
+        if self.database_connection == 0 or self.car_connection == 0:
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.insertWidget(1,SorryWidget())  # 添加传感器系统页面
+            self.stacked_widget.insertWidget(1,SorryWidget())  # 添加传感器系统页面
+        else:
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.insertWidget(1,ChuanganqiWidget())  # 添加传感器系统页面
+            self.stacked_widget.insertWidget(2,XiaocheWidget())  # 添加传感器系统页面
+        pixmap = QPixmap(self.database_connection_icon_path)
+        scaled_pixmap = pixmap.scaled(QSize(20, 20))  # 调整图标大小为 20x20
+        self.database_connection_icon.setPixmap(QPixmap(scaled_pixmap))
+      
+    def update_car_connection(self, value):
+        self.car_connection = value
+        if self.car_connection ==0 :
+            self.wifi_connection_icon_path = "./icon_disconnect/wifi.svg"
+        else:
+            self.wifi_connection_icon_path = "./icon_connect/wifi.svg"            
+        if self.car_connection == 0 or self.database_connection == 0:
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.insertWidget(1,SorryWidget())  
+            self.stacked_widget.insertWidget(1,SorryWidget()) 
+        else:
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
+            self.stacked_widget.insertWidget(1,ChuanganqiWidget())  # 添加传感器系统页面
+            self.stacked_widget.insertWidget(2,XiaocheWidget())  # 添加传感器系统页面
+        pixmap = QPixmap(self.wifi_connection_icon_path)
+        scaled_pixmap = pixmap.scaled(QSize(20, 20))  # 调整图标大小为 20x20
+        self.wifi_connection_icon.setPixmap(QPixmap(scaled_pixmap))
+    
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     welcome_screen = wholeScreen()

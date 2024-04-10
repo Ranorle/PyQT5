@@ -5,21 +5,21 @@ from PyQt5.QtGui import *
 
 class WelcomeWidget(QWidget):
     sensor_system_clicked = pyqtSignal(int)
+
     def __init__(self):
         super().__init__()
         self.initUI()
-    
+
     def initUI(self):
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(0, 0, 0, 0)  # 设置vlayout布局边距为0
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
-        # 垂直布局用于容纳打字机部分和按钮
         vertical_layout = QVBoxLayout()
-        
+
         center_widget = QWidget()
         center_layout = QHBoxLayout(center_widget)
         center_layout.setAlignment(Qt.AlignCenter | Qt.AlignBottom)
-        
+
         center_widget.setObjectName("centerWidget")
         self.welcome_label = QLabel('', center_widget)
         self.welcome_label.setObjectName('welcomeLabel')
@@ -27,25 +27,23 @@ class WelcomeWidget(QWidget):
         self.welcome_label.setFont(font)
         center_layout.addWidget(self.welcome_label)
 
-        # 添加光标label
         self.cursor_label = QLabel('|', center_widget)
         self.cursor_label.setObjectName('cursorLabel')
         center_layout.addWidget(self.cursor_label)
-        
-        # 将按钮布局添加到中心布局
-        button_layout = QHBoxLayout()  # 按钮布局
-        button1 = QPushButton('进入传感器系统')
-        button2 = QPushButton('进入小车控制系统')
-        button3 = QPushButton('进入历史数据查询')
-        button4 = QPushButton('进入设置')
-        button1.setObjectName('entrybutton')
-        button2.setObjectName('entrybutton')
-        button3.setObjectName('entrybutton')
-        button4.setObjectName('entrybutton')
-        button_layout.addWidget(button1)
-        button_layout.addWidget(button2)
-        button_layout.addWidget(button3)
-        button_layout.addWidget(button4)
+
+        button_layout = QHBoxLayout()
+        self.button1 = QPushButton('进入传感器系统')
+        self.button2 = QPushButton('进入小车控制系统')
+        self.button3 = QPushButton('进入历史数据查询')
+        self.button4 = QPushButton('进入设置')
+        self.button1.setObjectName('entrybutton')
+        self.button2.setObjectName('entrybutton')
+        self.button3.setObjectName('entrybutton')
+        self.button4.setObjectName('entrybutton')
+        button_layout.addWidget(self.button1)
+        button_layout.addWidget(self.button2)
+        button_layout.addWidget(self.button3)
+        button_layout.addWidget(self.button4)
 
         vertical_layout.addWidget(center_widget)
         vertical_layout.addLayout(button_layout)
@@ -53,30 +51,28 @@ class WelcomeWidget(QWidget):
         main_layout.addLayout(vertical_layout)
         self.setLayout(main_layout)
 
-        button1.clicked.connect(self.enterSensorSystem)
-        button2.clicked.connect(self.enterCarControlSystem)
-        button3.clicked.connect(self.enterDataQuery)
-        button4.clicked.connect(self.enterSettings)
-        
-        # 设置打字机效果的定时器
+        self.button1.clicked.connect(self.enterSensorSystem)
+        self.button2.clicked.connect(self.enterCarControlSystem)
+        self.button3.clicked.connect(self.enterDataQuery)
+        self.button4.clicked.connect(self.enterSettings)
+
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updateLabel)
         self.index = 0
         self.texts = ["你好！", "欢迎来到无敌爆龙战神之上位机系统!", "中国农业大学信电学院电子212究级之第13小组", "荣誉巨献。"]
         self.current_text_index = 0
         self.is_deleting = False
-        self.is_showing_cursor = False  # 控制光标显示
-        self.is_paused = False  # 控制暂停
-        self.typing_speed = 100  # 打字速度（单位：毫秒）
-        self.last_text_typing_speed = 200  # 最后一个字符串打字速度（单位：毫秒）
-        self.pause_time1 = 2000  # 暂停时间（单位：毫秒）
-        self.pause_time2 = 800  # 暂停时间（单位：毫秒）
+        self.is_showing_cursor = False
+        self.is_paused = False
+        self.typing_speed = 100
+        self.last_text_typing_speed = 200
+        self.pause_time1 = 2000
+        self.pause_time2 = 800
         self.cursor_time = 500
         self.pause_timer = QTimer(self)
         self.pause_timer.timeout.connect(self.resumeTyping)
-        self.timer.start(self.typing_speed)  # 设置定时器间隔为100毫秒
+        self.timer.start(self.typing_speed)
 
-        # 光标闪烁定时器
         self.cursor_blink_timer = QTimer(self)
         self.cursor_blink_timer.timeout.connect(self.blinkCursor)
         self.is_cursor_black = True
@@ -91,9 +87,9 @@ class WelcomeWidget(QWidget):
                 self.cursor_label.setVisible(self.is_showing_cursor)
             else:
                 self.is_deleting = True
-                self.timer.stop()  # 停止打字效果定时器
-                self.pause_timer.start(self.pause_time1 if self.current_text_index != len(self.texts) - 1 else self.pause_time2)  # 开始暂停定时器
-                self.cursor_blink_timer.start(500)  # 停止光标闪烁定时器
+                self.timer.stop()
+                self.pause_timer.start(self.pause_time1 if self.current_text_index != len(self.texts) - 1 else self.pause_time2)
+                self.cursor_blink_timer.start(500)
         else:
             if self.index >= 0:
                 self.welcome_label.setText(current_text[:self.index])
@@ -104,9 +100,9 @@ class WelcomeWidget(QWidget):
                 self.is_deleting = False
                 self.timer.stop()
                 self.current_text_index = (self.current_text_index + 1) % len(self.texts)
-                self.pause_timer.start(self.pause_time2)  # 开始暂停定时器
-                self.cursor_blink_timer.start(500)  # 停止光标闪烁定时器
-                if self.current_text_index == len(self.texts) - 1:  # 如果是最后一个字符串，改变打字速度
+                self.pause_timer.start(self.pause_time2)
+                self.cursor_blink_timer.start(500)
+                if self.current_text_index == len(self.texts) - 1:
                     self.timer.start(self.last_text_typing_speed)
                 else:
                     self.timer.start(self.typing_speed)
@@ -114,26 +110,26 @@ class WelcomeWidget(QWidget):
     def resumeTyping(self):
         self.is_paused = False
         self.pause_timer.stop()
-        self.timer.start()  # 重新启动打字效果定时器
-        self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: black; }")  # 设置光标颜色为黑色
-        self.cursor_blink_timer.start(500)  # 开始光标闪烁定时器
+        self.timer.start()
+        self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: black; }")
+        self.cursor_blink_timer.start(500)
 
     def blinkCursor(self):
         if self.is_cursor_black:
-            self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: transparent; }")  # 设置光标颜色为透明
+            self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: transparent; }")
             self.is_cursor_black = False
         else:
-            self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: black; }")  # 设置光标颜色为黑色
+            self.cursor_label.setStyleSheet("QLabel#cursorLabel { color: black; }")
             self.is_cursor_black = True
 
     def enterSensorSystem(self):
-        self.sensor_system_clicked.emit(1)  # Emit the signal when the button is clicked
+        self.sensor_system_clicked.emit(1)
 
     def enterCarControlSystem(self):
-        self.sensor_system_clicked.emit(2)  # Emit the signal when the button is clicked
+        self.sensor_system_clicked.emit(2)
 
     def enterDataQuery(self):
-        self.sensor_system_clicked.emit(3)  # Emit the signal when the button is clicked
+        self.sensor_system_clicked.emit(3)
 
     def enterSettings(self):
-        self.sensor_system_clicked.emit(4)  # Emit the signal when the button is clicked
+        self.sensor_system_clicked.emit(4)
