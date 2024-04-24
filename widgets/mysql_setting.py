@@ -5,8 +5,11 @@ from PyQt5.QtGui import *
 import pymysql
 
 class MySQLConnectionWidget(QWidget):
+    
+    connection_params_signal = pyqtSignal(str,str,str,str,str)
     connection_success = pyqtSignal()
     connection_failure = pyqtSignal(str)
+    connection = None
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -40,12 +43,14 @@ class MySQLConnectionWidget(QWidget):
         self.password_label = QLabel("密码:")
         self.password_edit = QLineEdit()
         self.password_edit.setEchoMode(QLineEdit.Password)
+        self.password_edit.setPlaceholderText("默认密码")
         layout.addWidget(self.password_label)
         layout.addWidget(self.password_edit)
 
         # Database
         self.database_label = QLabel("数据库:")
         self.database_edit = QLineEdit()
+        self.database_edit.setPlaceholderText("默认数据库为car")
         layout.addWidget(self.database_label)
         layout.addWidget(self.database_edit)
 
@@ -60,18 +65,16 @@ class MySQLConnectionWidget(QWidget):
         self.ip = self.ip_edit.text() or "127.0.0.1"
         self.port = self.port_edit.text() or "3306"
         self.username = self.username_edit.text() or "root"
-        self.password = self.password_edit.text()
-        self.database = self.database_edit.text()
-
+        self.password = self.password_edit.text() or "password"
+        self.database = self.database_edit.text() or "car"
         # Check if any field is empty
         if not self.database:
-            QMessageBox.warning(self, "连接失败", "请填写完整的连接信息")
             return
-
         try:
             # Connect to MySQL database
-            connection = pymysql.connect(host=self.ip, port=int(self.port), user=self.username, password=self.password, database=self.database)
-            connection.close()  # Close connection
+            self.connection = pymysql.connect(host=self.ip, port=int(self.port), user=self.username, password=self.password, database=self.database)
+            # self.connection.close()  # Close connection
+            self.connection_params_signal.emit(self.ip,self.port,self.username,self.password,self.database)
             self.connection_success.emit()  # Emit signal for successful connection
             QMessageBox.information(self, "Connection Status", "成功连接到 MySQL 数据库")
             parent_window = self.window()

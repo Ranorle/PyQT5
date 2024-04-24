@@ -8,13 +8,21 @@ from widgets.xiaoche_widget import XiaocheWidget
 from widgets.lishishuju_widget import HistoryWidget
 from widgets.shezhi_widget import SettingWidget
 from widgets.sorry_widget import SorryWidget
+from widgets.mysql_setting import MySQLConnectionWidget
+from qframelesswindow import FramelessMainWindow
+import pymysql
 
-class wholeScreen(QMainWindow):
+class wholeScreen(FramelessMainWindow):
     def __init__(self):
         super().__init__()
         self.database_connection = 0
         self.car_connection = 0
         self.initUI()
+        self.draggable = False
+        self.offset = None
+        self.titleBar.raise_()
+        self.sorry_widget=SorryWidget()
+
 
     def initUI(self):
         self.setWindowTitle('无敌爆龙战神小车之上位机系统')
@@ -88,7 +96,7 @@ class wholeScreen(QMainWindow):
         scaled_pixmap = pixmap.scaled(QSize(24, 24))  # 调整图标大小为 20x20
         self.wifi_connection_icon.setPixmap(scaled_pixmap)
         right_layout.addWidget(self.wifi_connection_icon)
-        
+        right_layout.setContentsMargins(0,0,140,0)
         top_layout.addWidget(right_widget)
 
         # 将顶部区域添加到主布局中
@@ -151,7 +159,7 @@ class wholeScreen(QMainWindow):
         self.list_widget.setViewportMargins(0, 10, 0, 0)
 
         self.list_widget.itemClicked.connect(self.onItemSelected)
-
+        
         # 连接WelcomeWidget的信号
         welcome_widget = self.stacked_widget.widget(0)  # 获取WelcomeWidget实例
         welcome_widget.sensor_system_clicked.connect(self.selectSensorSystemItem)
@@ -169,6 +177,9 @@ class wholeScreen(QMainWindow):
         
         setting_widget.database_connection_changed.connect(self.update_database_connection)
         setting_widget.car_connection_changed.connect(self.update_car_connection)
+        # 创建 MySQLConnectionWidget 实例
+        self.mysql_widget = MySQLConnectionWidget()
+        
     def onItemSelected(self, item):
         index = self.list_widget.row(item)
         self.stacked_widget.setCurrentIndex(index)
@@ -210,8 +221,8 @@ class wholeScreen(QMainWindow):
         if self.car_connection == 0 or self.database_connection == 0:
             self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
             self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
-            self.stacked_widget.insertWidget(1,SorryWidget())  
-            self.stacked_widget.insertWidget(1,SorryWidget()) 
+            self.stacked_widget.insertWidget(1,self.sorry_widget)  
+            self.stacked_widget.insertWidget(1,self.sorry_widget) 
         else:
             self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
             self.stacked_widget.removeWidget(self.stacked_widget.widget(1))
@@ -220,7 +231,7 @@ class wholeScreen(QMainWindow):
         pixmap = QPixmap(self.wifi_connection_icon_path)
         scaled_pixmap = pixmap.scaled(QSize(20, 20))  # 调整图标大小为 20x20
         self.wifi_connection_icon.setPixmap(QPixmap(scaled_pixmap))
-    
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     welcome_screen = wholeScreen()

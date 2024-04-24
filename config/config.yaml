@@ -1,0 +1,20 @@
+graph:
+  curve_num: 3  # 曲线的数量
+  curve_names:  # 曲线的名称
+    - 温度(℃)
+    - 湿度(%)
+    - 光照(Lex)
+    # - l5
+    # - l6
+  attention_range: 10000 # 专注显示的范围
+  curve_color: # 曲线的颜色
+    - "#ff7f0e"
+    - "#2ca02c"
+    - "#1f77b4"
+    - "#b22222"
+    - "#ffff00"
+    - "#ff1493"
+    - "#00bfbf"
+    - "#00bfff"
+    - "#7fffd4"
+    - "#32cd32"

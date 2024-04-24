@@ -22,15 +22,14 @@ async def handle_connection(websocket, path):
             # 如果收到 "chuanganqishuju" 消息，则发送 JSON 回复
             if message == "chuanganqishuju":
                 # 获取当前时间
-                current_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 # 获取温度、湿度和光照信息
                 temperature, humidity, light = get_sensor_data()
                 # 构建回复的 JSON 数据
                 reply_data = {
-                    "time": current_time,
+                    "time": 12345,
                     "temperature": temperature,
-                    "humidity": humidity,
-                    "light": light
+                    "relative humidity": humidity,
+                    "light intensity": light
                 }
                 reply_json = json.dumps(reply_data)
                 await websocket.send(reply_json)

@@ -1,3 +1,4 @@
+import json
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -8,9 +9,25 @@ from widgets.car_setting import CarConnectionWidget
 
 
 class SettingWidget(QWidget):
+    def save_mysql_info_to_json(self, filename):
+        mysql_info = {
+            "ip": self.ip,
+            "port": self.port,
+            "username": self.username,
+            "password": self.password,
+            "database": self.database
+        }
+        with open(filename, 'w') as f:
+            json.dump(mysql_info, f)
+                
+    send_data = pyqtSignal(str,str,str,str,str)
     database_connection_changed = pyqtSignal(int)
     car_connection_changed = pyqtSignal(int)
-
+    ip=''
+    port=''
+    username=''
+    password=''
+    database=''
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -66,6 +83,13 @@ class SettingWidget(QWidget):
         car_layout.addWidget(self.car_info_label, 2, 0, 1, 2)
 
         main_layout.addWidget(car_groupbox)
+    def connect_to_mysql(self,ip,port,username,password,database):
+        self.ip=ip
+        self.port=port
+        self.username=username
+        self.password=password
+        self.database=database
+        self.save_mysql_info_to_json("mysql_data")
 
     def show_mysql_connection_widget(self):
         dialog = QDialog(self)
@@ -73,6 +97,7 @@ class SettingWidget(QWidget):
         dialog.resize(500, 400)
         dialog.setLayout(QVBoxLayout())
         self.mysql_widget = MySQLConnectionWidget()
+        self.mysql_widget.connection_params_signal.connect(self.connect_to_mysql)
         self.mysql_widget.connection_success.connect(self.handle_mysql_connection_success)
         self.mysql_widget.connection_failure.connect(self.handle_mysql_connection_failure)
         dialog.layout().addWidget(self.mysql_widget)
