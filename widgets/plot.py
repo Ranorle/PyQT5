@@ -13,7 +13,6 @@ class Line_plot(threading.Thread):
         self.load_yaml()
         # 绘图部分初始化
         self.graph_init()
-
         # 线程控制变量!!
         self.__flag = threading.Event()     # 用于暂停线程的标识
         self.__flag.set()                   # 设置为True
@@ -29,9 +28,8 @@ class Line_plot(threading.Thread):
 
         self.pen_list = [
             pg.mkPen(width=3,color=self.color_list[i]) 
-            for i in range(len(self.color_list))
+                         for i in range(len(self.color_list))
         ]
-
         # 样式设置
         self.win.setBackground('white')
         # 添加标签(标签也要占据行数)
@@ -101,7 +99,7 @@ class Line_plot(threading.Thread):
         self.hLine = pg.InfiniteLine(angle=0, movable=False)
         self.p1.addItem(self.vLine, ignoreBounds=True)
         self.p1.addItem(self.hLine, ignoreBounds=True)
-        self.proxy = pg.SignalProxy(self.p1.scene().sigMouseMoved,rateLimit=60, slot=self.mouseMoved)
+        #self.proxy = pg.SignalProxy(self.p1.scene().sigMouseMoved,rateLimit=60, slot=self.mouseMoved)
     
 
     def load_yaml(self):
@@ -158,18 +156,18 @@ class Line_plot(threading.Thread):
             self.label.setText(res_text)
 
     # 拿到鼠标对应坐标位置
-    def __get_stats_text(self,mousePoint):
+    def __get_stats_text(self, mousePoint):
         index = int(mousePoint.x())
         self.vLine.setPos(mousePoint.x())
         self.hLine.setPos(mousePoint.y())
         x_text = f"<span style='font-size: 12pt'>x={mousePoint.x():.2f} "
         tmp = ""
-        if index > 0:
-            for idx,key in enumerate(self.pic_dict):
-                color = self.color_list[idx]
+        for idx, key in enumerate(self.data_dict):
+            color = self.color_list[idx]
+            if index >= 0 and index < len(self.data_dict[key]):  # 确保索引合法
                 data = self.data_dict[key][index]
                 tmp += f"<span style='color:{color}'>{key}={data}</span> "
-        return x_text+tmp
+        return x_text + tmp
 
 
     # 线程入口!

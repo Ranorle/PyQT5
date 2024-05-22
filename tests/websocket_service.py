@@ -13,32 +13,51 @@ def get_sensor_data():
 
 # 客户端连接时触发的处理函数
 async def handle_connection(websocket, path):
-    # 打印客户端连接信息
+    duan = 1
+    licheng = 0
     print(f"Client connected from {websocket.remote_address}")
     try:
-        # 不断循环，接收客户端发送的消息并回传
-        async for message in websocket:
-            print(f"Received message: {message}")
-            # 如果收到 "chuanganqishuju" 消息，则发送 JSON 回复
-            if message == "chuanganqishuju":
+        async def send_sensor_data():
+            nonlocal duan, licheng
+            while True:
+                if licheng >= 30:
+                    licheng = 0
                 # 获取当前时间
+                current_time = datetime.datetime.now().timestamp()
                 # 获取温度、湿度和光照信息
                 temperature, humidity, light = get_sensor_data()
                 # 构建回复的 JSON 数据
                 reply_data = {
-                    "time": 12345,
+                    "time": current_time,
                     "temperature": temperature,
                     "relative humidity": humidity,
-                    "light intensity": light
+                    "light intensity": light,
+                    "duan": str(duan),
+                    "licheng": str(licheng)
                 }
                 reply_json = json.dumps(reply_data)
                 await websocket.send(reply_json)
-            else:
-                # 回传收到的消息
-                await websocket.send(message)
+                await websocket.recv()  # 等待客户端发送请求
+                licheng += 1
+
+        # 创建定时器任务，每隔10秒更新duan的值
+        async def update_duan():
+            nonlocal duan 
+            while True:
+                await asyncio.sleep(15)
+                duan += 1
+                if duan == 5:
+                    duan = 1
+
+        # 开始定时器任务
+        send_sensor_data_task = asyncio.create_task(send_sensor_data())
+        update_duan_task = asyncio.create_task(update_duan())
+
+        # 等待定时器任务结束
+        await asyncio.gather(send_sensor_data_task, update_duan_task)
+
     finally:
         print(f"Client {websocket.remote_address} disconnected")
-
 # 启动 WebSocket 服务器
 start_server = websockets.serve(handle_connection, "localhost", 8765)
 

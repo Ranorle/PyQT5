@@ -20,12 +20,14 @@ class CarConnectionWidget(QWidget):
         # IP 地址
         self.ip_label = QLabel("小车 IP 地址:")
         self.ip_edit = QLineEdit()
+        self.ip_edit.setPlaceholderText("默认ip:127.0.0.1")
         layout.addWidget(self.ip_label)
         layout.addWidget(self.ip_edit)
 
         # 端口
         self.port_label = QLabel("端口:")
         self.port_edit = QLineEdit()
+        self.port_edit.setPlaceholderText("默认端口:8765")
         layout.addWidget(self.port_label)
         layout.addWidget(self.port_edit)
 
@@ -44,8 +46,8 @@ class CarConnectionWidget(QWidget):
             parent_window.close()  # 在成功连接时关闭父窗口
 
     def connect_to_websocket(self):
-        self.ip = self.ip_edit.text()
-        self.port = self.port_edit.text()
+        self.ip = self.ip_edit.text() or "127.0.0.1"
+        self.port = self.port_edit.text() or "8765"
 
         self.socket.error.connect(self.on_error)
         self.socket.connected.connect(self.on_connected)
@@ -55,13 +57,13 @@ class CarConnectionWidget(QWidget):
         self.socket.open(uri)
 
     def on_connected(self):
-        ip = self.ip_edit.text()
-        port = self.port_edit.text()
+        ip = self.ip_edit.text() or "127.0.0.1"
+        port = self.port_edit.text() or "8765"
         self.display_message(True, ip, port)
 
     def on_disconnected(self):
-        ip = self.ip_edit.text()
-        port = self.port_edit.text()
+        ip = self.ip_edit.text() or "127.0.0.1"
+        port = self.port_edit.text() or "8765"
         self.display_message(False, ip, port)
 
     def on_error(self, error_code):
